@@ -14,6 +14,12 @@ align-items: center;
 export const Friends = (props) => {
 
    const [friends, setFriends] = useState();
+   const [data, setData] = useState({
+      id: Date.now(),
+      name: '',
+      age: '',
+      email: ''
+   });
 
    useEffect(() => {
       axiosWithAuth().get('/api/friends')
@@ -25,13 +31,36 @@ export const Friends = (props) => {
 
    console.log('friends data', friends)
 
+   const onChange = (e) => {
+      setData({
+         ...data, 
+         [e.target.name]: e.target.value
+      });
+   }
+
+   const onSubmit = (e) => {
+      e.preventDefault();
+      axiosWithAuth().post('/api/friends', data)
+      .then(res => setFriends(res.data))
+      .catch(err => console.log(err))
+   }
+
    return (
       <>
          <p>friends component</p>
+         <form onSubmit = {onSubmit}>
+            <label name = 'name' >Name</label>
+            <input htmlFor = 'name' name = 'name' value = {data.name} onChange = {onChange}/>
+            <label name = 'age' >Age</label>
+            <input htmlFor = 'age' name = 'age' value = {data.age} onChange = {onChange}/>
+            <label name = 'email' >Email</label>
+            <input htmlFor = 'email' name = 'email' value = {data.email} onChange = {onChange}/>
+            <button>Submit</button>
+         </form>
          <Box>
             {friends ? friends.map((item, index) => (
                <Friend friend = {item} key = {index}/>
-            )) : 'No data'}
+            )) : 'No friends.'}
          </Box>
       </>
    )
